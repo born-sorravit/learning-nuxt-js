@@ -32,4 +32,5 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  ssr: true, // ค่า default
 });

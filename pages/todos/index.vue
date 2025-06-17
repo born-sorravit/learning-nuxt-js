@@ -52,14 +52,20 @@ import type { ITodos } from "~/types/todo";
 useHead({ title: "Todos" });
 
 const todoText = ref("");
-const todoLists = ref<ITodos[]>([]);
+// const todoLists = ref<ITodos[]>([]);
 const isLoading = ref(false);
 const BASE_URL = "https://684fa4a6e7c42cfd17955654.mockapi.io";
 
-const getTodos = async () => {
-  const { data } = await useFetch<ITodos[]>(`${BASE_URL}/todos`);
-  todoLists.value = data.value ?? [];
-};
+// const getTodos = async () => {
+//   const { data } = await useFetch<ITodos[]>(`${BASE_URL}/todos`);
+//   todoLists.value = data.value ?? [];
+// };
+// ✅ SSR: useAsyncData จะดึงข้อมูลในฝั่ง server
+const { data: todoLists, refresh } = await useAsyncData<ITodos[]>(
+  "todos",
+  () => $fetch(`${BASE_URL}/todos`, { method: "GET" }),
+  { server: true }
+);
 
 const createTodo = async () => {
   try {
@@ -73,7 +79,7 @@ const createTodo = async () => {
       },
     });
 
-    await getTodos();
+    await refresh();
   } catch (error) {
     console.error("Error creating todo:", error);
   } finally {
@@ -93,7 +99,7 @@ const updateTodo = async (id: number, status: string) => {
   }
 };
 
-getTodos();
+// getTodos();
 </script>
 
 <style lang="scss" scoped></style>
